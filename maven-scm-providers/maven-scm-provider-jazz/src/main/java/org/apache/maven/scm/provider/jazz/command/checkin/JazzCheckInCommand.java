@@ -34,6 +34,7 @@ import org.apache.maven.scm.provider.jazz.command.JazzScmCommand;
 import org.apache.maven.scm.provider.jazz.command.add.JazzAddCommand;
 import org.apache.maven.scm.provider.jazz.command.consumer.DebugLoggerConsumer;
 import org.apache.maven.scm.provider.jazz.command.consumer.ErrorConsumer;
+import org.apache.maven.scm.provider.jazz.command.status.JazzStatusCommand;
 import org.apache.maven.scm.provider.jazz.repository.JazzScmProviderRepository;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.cli.StreamConsumer;
@@ -115,6 +116,11 @@ public class JazzCheckInCommand
                                          errConsumer.getOutput(), false );
         }
 
+        // call the status command to populate the jazzRepo info and extract the changeset id
+        JazzStatusCommand statusCmd = new JazzStatusCommand();
+        statusCmd.setLogger( getLogger() );
+        statusCmd.executeStatusCommand( repository, fileSet );
+        
         // Check to see if we've had a workItem defined (via -DworkItem=XXXX)
         JazzScmProviderRepository jazzRepo = (JazzScmProviderRepository) repository;
         if ( jazzRepo.isPushChangesAndHaveFlowTargets() && StringUtils.isNotEmpty( jazzRepo.getWorkItem() ) )
